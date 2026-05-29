@@ -12,6 +12,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 99; }
+@media (max-width: 1024px) {
+  .sidebar-overlay.open { display: block; }
+  .hydris-sidebar { position: fixed !important; left: 0; top: 0; height: 100vh; z-index: 100; transform: translateX(-100%); transition: transform 0.25s ease; }
+  .hydris-sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.35); }
+  .hydris-main { margin-left: 0 !important; }
+  .hamburger-btn { display: flex !important; }
+  .hydris-topbar { display: flex !important; }
+}
+@media (min-width: 1025px) {
+  .hydris-sidebar { position: relative !important; transform: none !important; }
+  .hamburger-btn { display: none !important; }
+  .hydris-topbar { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -43189,7 +43203,13 @@ const SDSManagementScreen = ({ navigate }) => {
 };
 function HydrisFieldPrototype() {
   const [screen, setScreen] = useState("dashboard");
-  const navigate = (s) => setScreen(s);
+  const navigate = (s) => { setScreen(s); if (sidebarOpen && window.innerWidth <= 1024) setSidebarOpen(false); };
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 1024);
+  useEffect(() => {
+    const handleResize = () => { if (window.innerWidth > 1024) setSidebarOpen(true); };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const sidebarSections = [
     { label: "MAIN", items: [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -43287,7 +43307,7 @@ function HydrisFieldPrototype() {
     notifications: /* @__PURE__ */ React.createElement(NotificationsScreen, { navigate }),
     whyHydris: /* @__PURE__ */ React.createElement(WhyHydrisScreen, { navigate })
   };
-  return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", height: "100vh", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 240, background: C.sidebar, color: "#fff", display: "flex", flexDirection: "column", flexShrink: 0, overflowY: "auto" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "20px 20px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.08)" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 32, height: 32, borderRadius: 8, background: C.brand, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Droplets, { size: 18, color: "#fff" })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 16, fontWeight: 800, letterSpacing: -0.3 } }, "Hydris Field"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 500 } }, "v1.0 \xB7 Interactive Prototype"))), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, padding: "8px 0" } }, sidebarSections.map((section, si) => /* @__PURE__ */ React.createElement("div", { key: si, style: { marginBottom: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 20px 4px", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 1, textTransform: "uppercase" } }, section.label), section.items.map((item) => {
+  return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", height: "100vh", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { className: "sidebar-overlay" + (sidebarOpen ? " open" : ""), onClick: () => setSidebarOpen(false) }), /* @__PURE__ */ React.createElement("div", { className: "hydris-sidebar" + (sidebarOpen ? " open" : ""), style: { width: 240, background: C.sidebar, color: "#fff", display: "flex", flexDirection: "column", flexShrink: 0, overflowY: "auto" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "20px 20px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.08)" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 32, height: 32, borderRadius: 8, background: C.brand, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Droplets, { size: 18, color: "#fff" })), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 16, fontWeight: 800, letterSpacing: -0.3 } }, "Hydris Field"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 500 } }, "v1.0 \xB7 Interactive Prototype"))), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, padding: "8px 0" } }, sidebarSections.map((section, si) => /* @__PURE__ */ React.createElement("div", { key: si, style: { marginBottom: 4 } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 20px 4px", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 1, textTransform: "uppercase" } }, section.label), section.items.map((item) => {
     const active = screen === item.id || item.id === "reports" && screen === "reportDetail";
     const Icon = item.icon;
     return /* @__PURE__ */ React.createElement(
@@ -43338,7 +43358,7 @@ function HydrisFieldPrototype() {
     },
     /* @__PURE__ */ React.createElement(Settings, { size: 16 }),
     /* @__PURE__ */ React.createElement("span", null, "Settings")
-  )), /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.08)" } }, /* @__PURE__ */ React.createElement("div", { onClick: () => navigate("profile"), style: { display: "flex", alignItems: "center", gap: 10, cursor: "pointer" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 32, height: 32, borderRadius: 99, background: C.brand, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12 } }, "GC"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 600 } }, "Greg CWT"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 9, fontWeight: 700, background: "rgba(239,68,68,0.2)", color: "#EF4444", padding: "1px 6px", borderRadius: 3, letterSpacing: 0.3 } }, "ADMIN")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.35)" } }, "ITOH2 \xB7 Super Admin"))))), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, overflowY: "auto", background: C.bg } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "28px 36px", maxWidth: 1100 } }, screens[screen] || /* @__PURE__ */ React.createElement(DashboardScreen, { navigate }))));
+  )), /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.08)" } }, /* @__PURE__ */ React.createElement("div", { onClick: () => navigate("profile"), style: { display: "flex", alignItems: "center", gap: 10, cursor: "pointer" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 32, height: 32, borderRadius: 99, background: C.brand, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12 } }, "GC"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 600 } }, "Greg CWT"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 9, fontWeight: 700, background: "rgba(239,68,68,0.2)", color: "#EF4444", padding: "1px 6px", borderRadius: 3, letterSpacing: 0.3 } }, "ADMIN")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.35)" } }, "ITOH2 \xB7 Super Admin"))))), /* @__PURE__ */ React.createElement("div", { className: "hydris-main", style: { flex: 1, overflowY: "auto", background: C.bg, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("div", { className: "hydris-topbar", style: { display: "none", alignItems: "center", gap: 12, padding: "12px 20px", background: C.sidebar, color: "#fff", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setSidebarOpen(!sidebarOpen), className: "hamburger-btn", style: { display: "flex", background: "none", border: "none", color: "#fff", cursor: "pointer", padding: 4, borderRadius: 6 } }, /* @__PURE__ */ React.createElement(Menu, { size: 22 })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 26, height: 26, borderRadius: 6, background: C.brand, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Droplets, { size: 14, color: "#fff" })), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 15, fontWeight: 700 } }, "Hydris Field"))), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, overflowY: "auto", padding: "28px 36px", maxWidth: 1100 } }, screens[screen] || /* @__PURE__ */ React.createElement(DashboardScreen, { navigate }))));
 }
 createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(HydrisFieldPrototype, null));
 
